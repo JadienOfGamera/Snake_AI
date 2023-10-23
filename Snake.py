@@ -15,26 +15,26 @@ class Snake:
         match key:
             case pygame.K_UP:
                 if self.body.__getitem__(0)[0] > 0 and not([[self.body.__getitem__(0)[0] - 1, self.body.__getitem__(0)[1]]] in self.body):
-                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1]])
+                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1] - 1])
                 else:
                     self.alive = False
             case pygame.K_DOWN:
                 if self.body.__getitem__(0)[0] < self.num_rows - 1 and not([[self.body.__getitem__(0)[0] + 1, self.body.__getitem__(0)[1]]] in self.body):
-                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1]])
+                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1] + 1])
                 else:
                     self.alive = False
             case pygame.K_LEFT:
                 if self.body.__getitem__(0)[1] > 0 and not ([[self.body.__getitem__(0)[0], self.body.__getitem__(0)[1] - 1]] in self.body):
-                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1]])
+                    self.body.insert(0, [self.body.__getitem__(0)[0] - 1, self.body.__getitem__(0)[1]])
                 else:
                     self.alive = False
                 pass
             case pygame.K_RIGHT:
                 if self.body.__getitem__(0)[1] < self.num_cols - 1 and not ([[self.body.__getitem__(0)[0], self.body.__getitem__(0)[1] + 1]] in self.body):
-                    self.body.insert(0, [self.body.__getitem__(0)[0], self.body.__getitem__(0)[1]])
+                    self.body.insert(0, [self.body.__getitem__(0)[0] + 1, self.body.__getitem__(0)[1]])
                 else:
                     self.alive = False
-        tail = []
+        tail = None
         if (key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT) and not apple:
             tail = self.body.pop()
         return self.alive, tail
