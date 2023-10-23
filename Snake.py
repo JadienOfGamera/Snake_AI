@@ -3,7 +3,7 @@ import pygame
 
 
 class Snake:
-    def __init__(self, num_cols, num_rows):
+    def __init__(self, num_rows, num_cols):
         self.body = []
         self.body.append([random.randint(0, num_rows), random.randint(0, num_cols)])
         self.alive = True
