@@ -1,9 +1,13 @@
 from random import randint
 import pygame, sys
-import Snake
+from Snake import Snake
+
+empty_cell_color = (255, 255, 255)
+apple_cell_color = (255, 0, 0)
+snakehead_cell_color = (0, 255, 255)
+snakebody_cell_color = (0, 255, 0)
 
 #Grid => 0 : Empty | 1 : Apple | 2 : Snake
-
 class GridCell:
     def __init__(self, cell, value):
         self.cell = cell
@@ -36,10 +40,10 @@ class Grid:
             for y in range(self.size_y):
                 rect = pygame.Rect(x * margin, y * margin, margin, margin)
                 if self.grid[x][y] == 0:
-                    pygame.draw.rect(self.screen, (255, 255, 255), rect, 1)
+                    pygame.draw.rect(self.screen, empty_cell_color, rect, 1)
                     row.append(GridCell(rect, 0))
                 elif self.grid[x][y] == 1:
-                    pygame.draw.rect(self.screen, (255, 0, 0), rect)
+                    pygame.draw.rect(self.screen, apple_cell_color, rect)
                     row.append(GridCell(rect, 1))
             self.grid_cell.append(row)
         pygame.display.update()
