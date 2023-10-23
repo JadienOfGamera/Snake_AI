@@ -7,7 +7,9 @@ apple_cell_color = (255, 0, 0)
 snakehead_cell_color = (0, 255, 255)
 snakebody_cell_color = (0, 255, 0)
 
-#Grid => 0 : Empty | 1 : Apple | 2 : Snake
+
+# Grid => 0 : Empty | 1 : Apple | 2 : Snake
+
 class GridCell:
     def __init__(self, cell, value):
         self.cell = cell
@@ -27,12 +29,11 @@ class Grid:
         self.grid[self.apple_pos_x][self.apple_pos_y] = 1
 
         self.grid_cell = [[]]
-        
+
         for case_x in range(self.size_y):
             for case_y in range(self.size_x):
                 print(self.grid[case_x][case_y], end="")
             print("")
-
 
     def draw_grid(self):
         for x in range(self.size_x):
@@ -48,9 +49,24 @@ class Grid:
             self.grid_cell.append(row)
         pygame.display.update()
 
+    def move_snake(self, key):
+        if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
+            [head_x, head_y] = snake.getHead()
+            apple = (pygame.K_UP and head_x - 1 == self.apple_pos_x) \
+                or (pygame.K_DOWN and head_x + 1 == self.apple_pos_x) \
+                or (pygame.K_LEFT and head_y - 1 == self.apple_pos_y) \
+                or (pygame.K_RIGHT and head_y + 1 == self.apple_pos_y)
+            alive, tail = snake.move(key, apple)
+            if tail:
+                # TODO: remove tail from drawn rectangles
+                pass
+            if not alive:
+                # TODO: end game
+                pass
+
 
 if __name__ == '__main__':
-    
+
     size_x = 20
     size_y = 20
     margin = 40
@@ -58,7 +74,7 @@ if __name__ == '__main__':
     HEIGHT = size_y * margin
 
     snake = Snake(size_x, size_y)
-    
+
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
