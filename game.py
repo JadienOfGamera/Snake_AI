@@ -1,14 +1,11 @@
-import time
 from random import randint
-import pygame, sys
+import pygame
 from Snake import Snake
 
 empty_cell_border_color = (255, 255, 255)
 empty_cell_color = (0, 0, 0)
 apple_cell_color = (255, 0, 0)
 snake_cell_color = (0, 255, 0)
-
-# Grid => 0 : Empty | 1 : Apple | 2 : Snake
 
 class Grid:
     def __init__(self, num_rows, num_cols, screen):
@@ -71,16 +68,19 @@ class Grid:
                 headRect = self.grid_cell[head_x][head_y]
                 pygame.draw.rect(self.screen, snake_cell_color, headRect)
                 pygame.display.update(headRect)
+                return True, self.get_score()
             else:
-                print(len(self.snake.body))
                 pygame.display.quit()
-                pass
+                return False, self.get_score()
+
+    def get_score(self):
+        return len(self.snake.body)
 
 
 def start():
-
     grid = Grid(num_rows, num_cols, screen)
     running = True
+    score = 0
 
     while running:
         for event in pygame.event.get():
@@ -88,9 +88,12 @@ def start():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                grid.move_snake(event.key)
-            pygame.event.clear()
-            pygame.event.set_allowed(pygame.KEYDOWN)
+                running, score = grid.move_snake(event.key)
+            if running:
+                pygame.event.clear()
+                pygame.event.set_allowed(pygame.KEYDOWN)
+
+    print("Final score:", score)
 
 
 if __name__ == '__main__':
