@@ -62,7 +62,6 @@ class Game:
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
             self.moves_no_apple += 1
             self.num_moves += 1
-            print(self.num_moves, self.moves_no_apple)
             [head_x, head_y] = self.snake.getHead()
             apple = (key == pygame.K_UP and head_x - 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
                 or (key == pygame.K_DOWN and head_x + 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
@@ -90,7 +89,7 @@ class Game:
     def get_score(self):
         return len(self.snake.body), self.num_moves
 
-    def start(self):
+    def start_human(self):
         running = True
         score = 0
 
@@ -110,4 +109,4 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    game.start()
+    game.start_human()

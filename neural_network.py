@@ -31,6 +31,11 @@ class NN:
             self.model.layers[layer_i].set_weights([np.array(weights), bias])
             num_used_c += self.size_layers[layer_i] * self.size_layers[layer_i + 1]
 
+    def predict(self, in_value):
+        if len(in_value) != self.size_layers[0]:
+            raise Exception("Invalid length of input array, size must be", self.size_layers[0])
+        return self.model.predict(in_value)
+
 
 if __name__ == "__main__":
     # INPUTS: manhattan distance head-apple, body length, free space on each side
