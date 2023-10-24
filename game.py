@@ -6,21 +6,31 @@ empty_cell_border_color = (255, 255, 255)
 empty_cell_color = (0, 0, 0)
 apple_cell_color = (255, 0, 0)
 snake_cell_color = (0, 255, 0)
+margin = 40
 
-class Grid:
-    def __init__(self, num_rows, num_cols, screen):
-        self.num_rows = num_rows
-        self.num_cols = num_cols
+NUM_ROWS = 10
+NUM_COLS = 10
+MAX_MOVES_NO_APPLE = 40
+
+
+class Game:
+    def __init__(self):
+        pygame.init()
+        screen = pygame.display.set_mode((NUM_COLS * margin, NUM_ROWS * margin))  # (width, height)
+        self.num_rows = NUM_ROWS
+        self.num_cols = NUM_COLS
         self.screen = screen
         self.apple_pos_x = None
         self.apple_pos_y = None
 
-        self.snake = Snake(num_rows, num_cols)
+        self.snake = Snake(self.num_rows, self.num_cols)
 
         self.grid_cell = []
         self.draw_grid()
 
         self.generate_apple()
+        self.moves_no_apple = 0
+        self.num_moves = 0
 
     def draw_grid(self):
         for x in range(self.num_rows):
@@ -42,14 +52,17 @@ class Grid:
             pygame.draw.rect(self.screen, snake_cell_color, oldAppleRect)
             pygame.display.update(oldAppleRect)
         while self.apple_pos_x is None or self.apple_pos_y is None or [self.apple_pos_x, self.apple_pos_y] in self.snake.body:
-            self.apple_pos_x = randint(0, num_rows - 1)
-            self.apple_pos_y = randint(0, num_cols - 1)
+            self.apple_pos_x = randint(0, self.num_rows - 1)
+            self.apple_pos_y = randint(0, self.num_cols - 1)
         newAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
         pygame.draw.rect(self.screen, apple_cell_color, newAppleRect)
         pygame.display.update(newAppleRect)
 
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
+            self.moves_no_apple += 1
+            self.num_moves += 1
+            print(self.num_moves, self.moves_no_apple)
             [head_x, head_y] = self.snake.getHead()
             apple = (key == pygame.K_UP and head_x - 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
                 or (key == pygame.K_DOWN and head_x + 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
@@ -63,7 +76,8 @@ class Grid:
                 pygame.display.update(tailRect)
             if apple:
                 self.generate_apple()
-            if alive:
+                self.moves_no_apple = 0
+            if alive and not(self.moves_no_apple > MAX_MOVES_NO_APPLE):
                 [head_x, head_y] = self.snake.getHead()
                 headRect = self.grid_cell[head_x][head_y]
                 pygame.draw.rect(self.screen, snake_cell_color, headRect)
@@ -74,35 +88,26 @@ class Grid:
                 return False, self.get_score()
 
     def get_score(self):
-        return len(self.snake.body)
+        return len(self.snake.body), self.num_moves
 
+    def start(self):
+        running = True
+        score = 0
 
-def start():
-    grid = Grid(num_rows, num_cols, screen)
-    running = True
-    score = 0
+        while running:
+            for event in pygame.event.get():
+                pygame.event.set_blocked(pygame.KEYDOWN)
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    running, score = self.move_snake(event.key)
+                if running:
+                    pygame.event.clear()
+                    pygame.event.set_allowed(pygame.KEYDOWN)
 
-    while running:
-        for event in pygame.event.get():
-            pygame.event.set_blocked(pygame.KEYDOWN)
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                running, score = grid.move_snake(event.key)
-            if running:
-                pygame.event.clear()
-                pygame.event.set_allowed(pygame.KEYDOWN)
-
-    print("Final score:", score)
+        print("Final score:", score)
 
 
 if __name__ == '__main__':
-    num_rows = 10
-    num_cols = 10
-    margin = 40
-    WIDTH = num_rows * margin
-    HEIGHT = num_cols * margin
-
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    start()
+    game = Game()
+    game.start()
