@@ -34,7 +34,7 @@ class NN:
     def predict(self, in_value):
         if len(in_value) != self.size_layers[0]:
             raise Exception("Invalid length of input array, size must be", self.size_layers[0])
-        return self.model.predict(tf.keras.utils.normalize(in_value, axis=0))
+        return self.model.predict(tf.keras.utils.normalize(in_value, axis=0), verbose=0)
 
 
 if __name__ == "__main__":

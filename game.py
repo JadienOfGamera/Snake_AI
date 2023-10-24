@@ -96,6 +96,18 @@ class Game:
     def get_score(self):
         return len(self.snake.body), self.num_moves
 
+    def get_free_space(self):
+        [space_up, space_down, space_left, space_right] = [0, 0, 0, 0]
+        # TODO: implement
+        return [space_up, space_down, space_left, space_right]
+
+    def get_apple_distance(self):
+        md_up = abs(self.apple_pos_x - self.snake.getHead()[0]) + abs(self.apple_pos_y - (self.snake.getHead()[1] - 1))
+        md_down = abs(self.apple_pos_x - self.snake.getHead()[0]) + abs(self.apple_pos_y - (self.snake.getHead()[1] + 1))
+        md_left = abs(self.apple_pos_x - (self.snake.getHead()[0] - 1)) + abs(self.apple_pos_y - self.snake.getHead()[1])
+        md_right = abs(self.apple_pos_x - (self.snake.getHead()[0] + 1)) + abs(self.apple_pos_y - self.snake.getHead()[1])
+        return [md_up, md_down, md_left, md_right]
+
     def start_human(self):
         running = True
         score = 0
