@@ -8,7 +8,6 @@ empty_cell_color = (0, 0, 0)
 apple_cell_color = (255, 0, 0)
 snake_cell_color = (0, 255, 0)
 
-
 # Grid => 0 : Empty | 1 : Apple | 2 : Snake
 
 class Grid:
@@ -38,7 +37,6 @@ class Grid:
         [snake_x, snake_y] = self.snake.getHead()
         head = self.grid_cell[snake_x][snake_y]
         pygame.draw.rect(self.screen, snake_cell_color, head, 0)
-
         pygame.display.update()
 
     def move_snake(self, key):
@@ -61,27 +59,17 @@ class Grid:
                 pygame.display.update(headRect)
                 pass
             else:
-                # TODO: end game
+                print(len(self.snake.body))
+                pygame.quit()
                 pass
 
 
-if __name__ == '__main__':
-
-    num_rows = 20
-    num_cols = 20
-    margin = 40
-    WIDTH = num_rows * margin
-    HEIGHT = num_cols * margin
-
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+def start():
 
     grid = Grid(num_rows, num_cols, screen)
-
     running = True
     grid.draw_grid()
 
-    lock = False
     while running:
         for event in pygame.event.get():
             pygame.event.set_blocked(pygame.KEYDOWN)
@@ -91,3 +79,15 @@ if __name__ == '__main__':
                 grid.move_snake(event.key)
             pygame.event.clear()
             pygame.event.set_allowed(pygame.KEYDOWN)
+
+
+if __name__ == '__main__':
+    num_rows = 20
+    num_cols = 20
+    margin = 40
+    WIDTH = num_rows * margin
+    HEIGHT = num_cols * margin
+
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    start()
