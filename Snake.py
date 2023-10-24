@@ -30,7 +30,7 @@ class Snake:
                     self.alive = False
                 pass
             case pygame.K_RIGHT:
-                if self.body[0][1] < self.num_cols - 1 and not ([[self.body[0][0], self.body[0][1] + 1]] in self.body):
+                if self.body[0][1] < self.num_cols - 1 and not ([self.body[0][0], self.body[0][1] + 1] in self.body):
                     self.body.insert(0, [self.body[0][0], self.body[0][1] + 1])
                 else:
                     self.alive = False

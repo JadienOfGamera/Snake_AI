@@ -97,8 +97,8 @@ def start():
 
 
 if __name__ == '__main__':
-    num_rows = 20
-    num_cols = 20
+    num_rows = 10
+    num_cols = 10
     margin = 40
     WIDTH = num_rows * margin
     HEIGHT = num_cols * margin
