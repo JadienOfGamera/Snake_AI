@@ -64,16 +64,16 @@ class Grid:
                 pygame.draw.rect(self.screen, empty_cell_color, tailRect)
                 pygame.draw.rect(self.screen, empty_cell_border_color, tailRect, 1)
                 pygame.display.update(tailRect)
+            if apple:
+                self.generate_apple()
             if alive:
                 [head_x, head_y] = self.snake.getHead()
                 headRect = self.grid_cell[head_x][head_y]
                 pygame.draw.rect(self.screen, snake_cell_color, headRect)
                 pygame.display.update(headRect)
-            if apple:
-                self.generate_apple()
             else:
                 print(len(self.snake.body))
-                pygame.quit()
+                pygame.display.quit()
                 pass
 
 
