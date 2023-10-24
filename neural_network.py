@@ -19,7 +19,7 @@ class NN:
         self.model.add(tf.keras.Input(shape=size_layers[0]))
         for i_layer in range(len(activations)):
             self.model.add(
-                tf.keras.layers.Dense(size_layers[i_layer + 1], activation=activations[i_layer], kernel_initializer=tf.keras.initializers.Zeros()))
+                tf.keras.layers.Dense(size_layers[i_layer + 1], activation=activations[i_layer], kernel_initializer=tf.keras.initializers.Zeros(), name=("Dense" + str(i_layer))))
 
     def set_weights(self, chromosomes):
         num_used_c = 0
@@ -34,7 +34,7 @@ class NN:
     def predict(self, in_value):
         if len(in_value) != self.size_layers[0]:
             raise Exception("Invalid length of input array, size must be", self.size_layers[0])
-        return self.model.predict(in_value)
+        return self.model.predict(tf.keras.utils.normalize(in_value, axis=0))
 
 
 if __name__ == "__main__":
@@ -46,3 +46,4 @@ if __name__ == "__main__":
     print("LEN:", len(c))
     nn.set_weights(c)
     print(nn.model.weights)
+    print(nn.predict([0, 1, 0.2, 0.3, 0, 1]))
