@@ -10,16 +10,19 @@ margin = 40
 
 NUM_ROWS = 10
 NUM_COLS = 10
-MAX_MOVES_NO_APPLE = 40
+MAX_MOVES_NO_APPLE = 30
 
 
 class Game:
-    def __init__(self):
-        pygame.init()
-        screen = pygame.display.set_mode((NUM_COLS * margin, NUM_ROWS * margin))  # (width, height)
+    def __init__(self, show=True):
+        self.show = show
+        if self.show:
+            pygame.init()
+            screen = pygame.display.set_mode((NUM_COLS * margin, NUM_ROWS * margin))  # (width, height)
+            self.screen = screen
+
         self.num_rows = NUM_ROWS
         self.num_cols = NUM_COLS
-        self.screen = screen
         self.apple_pos_x = None
         self.apple_pos_y = None
 
@@ -33,30 +36,32 @@ class Game:
         self.num_moves = 0
 
     def draw_grid(self):
-        for x in range(self.num_rows):
-            row = []
-            for y in range(self.num_cols):
-                rect = pygame.Rect(y * margin, x * margin, margin, margin)
-                pygame.draw.rect(self.screen, empty_cell_border_color, rect, 1)
-                row.append(rect)
-            self.grid_cell.append(row)
+        if self.show:
+            for x in range(self.num_rows):
+                row = []
+                for y in range(self.num_cols):
+                    rect = pygame.Rect(y * margin, x * margin, margin, margin)
+                    pygame.draw.rect(self.screen, empty_cell_border_color, rect, 1)
+                    row.append(rect)
+                self.grid_cell.append(row)
 
-        [snake_x, snake_y] = self.snake.getHead()
-        head = self.grid_cell[snake_x][snake_y]
-        pygame.draw.rect(self.screen, snake_cell_color, head, 0)
-        pygame.display.update()
+            [snake_x, snake_y] = self.snake.getHead()
+            head = self.grid_cell[snake_x][snake_y]
+            pygame.draw.rect(self.screen, snake_cell_color, head, 0)
+            pygame.display.update()
 
     def generate_apple(self):
-        if self.apple_pos_x is not None and self.apple_pos_y is not None:
+        if self.apple_pos_x is not None and self.apple_pos_y is not None and self.show:
             oldAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
             pygame.draw.rect(self.screen, snake_cell_color, oldAppleRect)
             pygame.display.update(oldAppleRect)
         while self.apple_pos_x is None or self.apple_pos_y is None or [self.apple_pos_x, self.apple_pos_y] in self.snake.body:
             self.apple_pos_x = randint(0, self.num_rows - 1)
             self.apple_pos_y = randint(0, self.num_cols - 1)
-        newAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
-        pygame.draw.rect(self.screen, apple_cell_color, newAppleRect)
-        pygame.display.update(newAppleRect)
+        if self.show:
+            newAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
+            pygame.draw.rect(self.screen, apple_cell_color, newAppleRect)
+            pygame.display.update(newAppleRect)
 
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
@@ -68,19 +73,21 @@ class Game:
                 or (key == pygame.K_LEFT and head_y - 1 == self.apple_pos_y and head_x == self.apple_pos_x) \
                 or (key == pygame.K_RIGHT and head_y + 1 == self.apple_pos_y and head_x == self.apple_pos_x)
             alive, tail = self.snake.move(key, apple)  # apple
-            if not (tail is None):
+            if not (tail is None) and self.show:
                 tailRect = self.grid_cell[tail[0]][tail[1]]
-                pygame.draw.rect(self.screen, empty_cell_color, tailRect)
-                pygame.draw.rect(self.screen, empty_cell_border_color, tailRect, 1)
-                pygame.display.update(tailRect)
+                if self.show:
+                    pygame.draw.rect(self.screen, empty_cell_color, tailRect)
+                    pygame.draw.rect(self.screen, empty_cell_border_color, tailRect, 1)
+                    pygame.display.update(tailRect)
             if apple:
                 self.generate_apple()
                 self.moves_no_apple = 0
             if alive and not(self.moves_no_apple > MAX_MOVES_NO_APPLE):
-                [head_x, head_y] = self.snake.getHead()
-                headRect = self.grid_cell[head_x][head_y]
-                pygame.draw.rect(self.screen, snake_cell_color, headRect)
-                pygame.display.update(headRect)
+                if self.show:
+                    [head_x, head_y] = self.snake.getHead()
+                    headRect = self.grid_cell[head_x][head_y]
+                    pygame.draw.rect(self.screen, snake_cell_color, headRect)
+                    pygame.display.update(headRect)
                 return True, self.get_score()
             else:
                 pygame.display.quit()
