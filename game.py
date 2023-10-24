@@ -1,3 +1,4 @@
+import time
 from random import randint
 import pygame, sys
 from Snake import Snake
@@ -26,7 +27,7 @@ class Grid:
         for x in range(self.num_rows):
             row = []
             for y in range(self.num_cols):
-                rect = pygame.Rect(x * margin, y * margin, margin, margin)
+                rect = pygame.Rect(y * margin, x * margin, margin, margin)
                 if x == self.apple_pos_x and y == self.apple_pos_y:
                     pygame.draw.rect(self.screen, apple_cell_color, rect)
                 else:
@@ -43,18 +44,21 @@ class Grid:
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
             [head_x, head_y] = self.snake.getHead()
-            apple = (pygame.K_UP and head_x - 1 == self.apple_pos_x) \
-                or (pygame.K_DOWN and head_x + 1 == self.apple_pos_x) \
-                or (pygame.K_LEFT and head_y - 1 == self.apple_pos_y) \
-                or (pygame.K_RIGHT and head_y + 1 == self.apple_pos_y)
-            alive, tail = self.snake.move(key, apple)
+            apple = (pygame.K_UP and head_x - 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
+                or (pygame.K_DOWN and head_x + 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
+                or (pygame.K_LEFT and head_y - 1 == self.apple_pos_y and head_x == self.apple_pos_x) \
+                or (pygame.K_RIGHT and head_y + 1 == self.apple_pos_y and head_x == self.apple_pos_x)
+            alive, tail = self.snake.move(key, apple)  # apple
             if not (tail is None):
-                pygame.draw.rect(self.screen, empty_cell_color, self.grid_cell[tail[0]][tail[1]])
-                pygame.draw.rect(self.screen, empty_cell_border_color, self.grid_cell[tail[0]][tail[1]], 1)
-                pygame.display.update()
+                tailRect = self.grid_cell[tail[0]][tail[1]]
+                pygame.draw.rect(self.screen, empty_cell_color, tailRect)
+                pygame.draw.rect(self.screen, empty_cell_border_color, tailRect, 1)
+                pygame.display.update(tailRect)
             if alive:
                 [head_x, head_y] = self.snake.getHead()
-                pygame.draw.rect(self.screen, snake_cell_color, self.grid_cell[head_x][head_y])
+                headRect = self.grid_cell[head_x][head_y]
+                pygame.draw.rect(self.screen, snake_cell_color, headRect)
+                pygame.display.update(headRect)
                 pass
             else:
                 # TODO: end game
@@ -76,15 +80,14 @@ if __name__ == '__main__':
 
     running = True
     grid.draw_grid()
+
     lock = False
     while running:
         for event in pygame.event.get():
-            if not lock:
-                lock = True
-                if event.type == pygame.QUIT:
-                    running = False
-                if event.type == pygame.KEYDOWN:
-                    grid.move_snake(event.key)
-                pygame.display.update()
-                pygame.event.clear()
-            lock = False
+            pygame.event.set_blocked(pygame.KEYDOWN)
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                grid.move_snake(event.key)
+            pygame.event.clear()
+            pygame.event.set_allowed(pygame.KEYDOWN)
