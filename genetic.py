@@ -1,13 +1,15 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import multiprocessing
 import random
 
 import numpy as np
 
 from snake_neural_network import SnakeNN
 
-from matplotlib import pyplot as plt
 
-
-snn = SnakeNN()
+MULTITHREADING = True
 
 def create_population(size, num_chromosomes, min_chromosome, max_chromosome):
     pop = []
@@ -18,10 +20,11 @@ def create_population(size, num_chromosomes, min_chromosome, max_chromosome):
         pop.append(agent)
     return pop
 
-def fitness_func(agent, show=False):
+def fitness_func(agent, show=True):  # TODO: change default show
+    snn = SnakeNN()
     snn.set_weights(agent)
     apples, moves = snn.play(show)
-    f = apples ** 3 + moves
+    f = (2 * apples) ** 3 + moves
     if apples == 0:
         f -= moves
     return f + 1
@@ -31,8 +34,13 @@ def selection_tournament(population, num_selected):
 
 def selection_wheel(population, num_selected):
     fitness_vals = []
-    for actor in population:
-        fitness_vals.append(fitness_func(actor, True))  # TODO: change here the show value
+    pool = multiprocessing.Pool()
+    if MULTITHREADING:
+        for f in pool.imap(fitness_func, population):
+            fitness_vals.append(f)
+    else:
+        for actor in population:
+            fitness_vals.append(fitness_func(actor))
     new_population = random.choices(population, weights=fitness_vals, cum_weights=None, k=num_selected)
     sorted_new_pop = [x for _, x in sorted(zip(fitness_vals, new_population), reverse=True)]
     return sorted_new_pop, np.average(fitness_vals)
@@ -65,7 +73,7 @@ if __name__ == '__main__':
     max_val = 1.
     select_this_many = 50
     num_of_mutations = int(pop_size * 0.008)
-    num_of_chromosomes = snn.num_chromosomes
+    num_of_chromosomes = SnakeNN().num_chromosomes
     num_generations = 300
     selection_method = 'wheel'  # wheel or tournament
 
@@ -77,6 +85,7 @@ if __name__ == '__main__':
         p, avg_f = selection_wheel(p, num_selected=select_this_many)
         print("Generation", i_gen, " fitness", avg_f)
 
-    snn.set_weights(p[0])
+    snn_test = SnakeNN()
+    snn_test.set_weights(p[0])
     while True:
-        snn.play(show=True)
+        snn_test.play(show=True)
