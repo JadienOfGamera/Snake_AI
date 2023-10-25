@@ -32,7 +32,7 @@ def selection_tournament(population, num_selected):
 def selection_wheel(population, num_selected):
     fitness_vals = []
     for actor in population:
-        fitness_vals.append(fitness_func(actor, False))  # TODO: change here the show value
+        fitness_vals.append(fitness_func(actor, True))  # TODO: change here the show value
     new_population = random.choices(population, weights=fitness_vals, cum_weights=None, k=num_selected)
     sorted_new_pop = [x for _, x in sorted(zip(fitness_vals, new_population), reverse=True)]
     return sorted_new_pop, np.average(fitness_vals)
@@ -60,13 +60,13 @@ def mutation(population, num_mutations, min_chromosome, max_chromosome):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    pop_size = 100
+    pop_size = 150
     min_val = -1.  # maximum value of a chromosome
     max_val = 1.
-    select_this_many = 20
+    select_this_many = 50
     num_of_mutations = int(pop_size * 0.008)
     num_of_chromosomes = snn.num_chromosomes
-    num_generations = 100
+    num_generations = 300
     selection_method = 'wheel'  # wheel or tournament
 
     p = create_population(pop_size, num_of_chromosomes, min_val, max_val)
