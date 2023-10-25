@@ -9,29 +9,34 @@ class Snake:
         self.alive = True
         self.num_cols = num_cols
         self.num_rows = num_rows
+        self.last_move = None
 
     # key is a pygame.key
     def move(self, key, apple):
         match key:
             case pygame.K_UP:
-                if self.body[0][0] > 0 and not([self.body[0][0] - 1, self.body[0][1]] in self.body):
+                if self.body[0][0] > 0 and not([self.body[0][0] - 1, self.body[0][1]] in self.body) and not(self.last_move == pygame.K_DOWN):
                     self.body.insert(0, [self.body[0][0] - 1, self.body[0][1]])
+                    self.last_move = pygame.K_UP
                 else:
                     self.alive = False
             case pygame.K_DOWN:
-                if self.body[0][0] < self.num_rows - 1 and not([self.body[0][0] + 1, self.body[0][1]] in self.body):
+                if self.body[0][0] < self.num_rows - 1 and not([self.body[0][0] + 1, self.body[0][1]] in self.body) and not(self.last_move == pygame.K_UP):
                     self.body.insert(0, [self.body[0][0] + 1, self.body[0][1]])
+                    self.last_move = pygame.K_DOWN
                 else:
                     self.alive = False
             case pygame.K_LEFT:
-                if self.body[0][1] > 0 and not ([self.body[0][0], self.body[0][1] - 1] in self.body):
+                if self.body[0][1] > 0 and not ([self.body[0][0], self.body[0][1] - 1] in self.body) and not(self.last_move == pygame.K_RIGHT):
                     self.body.insert(0, [self.body[0][0], self.body[0][1] - 1])
+                    self.last_move = pygame.K_LEFT
                 else:
                     self.alive = False
                 pass
             case pygame.K_RIGHT:
-                if self.body[0][1] < self.num_cols - 1 and not ([self.body[0][0], self.body[0][1] + 1] in self.body):
+                if self.body[0][1] < self.num_cols - 1 and not ([self.body[0][0], self.body[0][1] + 1] in self.body) and not(self.last_move == pygame.K_LEFT):
                     self.body.insert(0, [self.body[0][0], self.body[0][1] + 1])
+                    self.last_move = pygame.K_RIGHT
                 else:
                     self.alive = False
         tail = None

@@ -10,7 +10,7 @@ margin = 40
 
 NUM_ROWS = 10
 NUM_COLS = 10
-MAX_MOVES_NO_APPLE = 30
+MAX_MOVES_NO_APPLE = 50
 
 
 class Game:
@@ -63,7 +63,7 @@ class Game:
             newAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
             pygame.draw.rect(self.screen, apple_cell_color, newAppleRect)
             pygame.display.update(newAppleRect)
-        self.grid_data[self.apple_pos_x][self.apple_pos_y]
+        self.grid_data[self.apple_pos_x][self.apple_pos_y] = 0
 
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
@@ -75,7 +75,6 @@ class Game:
                 or (key == pygame.K_LEFT and head_y - 1 == self.apple_pos_y and head_x == self.apple_pos_x) \
                 or (key == pygame.K_RIGHT and head_y + 1 == self.apple_pos_y and head_x == self.apple_pos_x)
             alive, tail = self.snake.move(key, apple)  # apple
-            print(self.get_free_space()) # TO REMOVE, JUST FOR TESTING
             if not (tail is None) and self.show:
                 tailRect = self.grid_cell[tail[0]][tail[1]]
                 if self.show:
@@ -118,20 +117,19 @@ class Game:
                 break
             space_down += 1
 
-        # Left
+        # Right
         for i in range(1, self.num_rows):
             new_x, new_y = head_x, head_y + i
             if new_y >= self.num_rows or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
                 break
-            space_left += 1
+            space_right += 1
 
-        # Right
+        # Left
         for i in range(1, self.num_rows):
             new_x, new_y = head_x, head_y - i
             if new_y < 0 or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
                 break
-            space_right += 1
-
+            space_left += 1
 
         return [space_up, space_down, space_left, space_right]
 
