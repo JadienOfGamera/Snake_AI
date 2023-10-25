@@ -28,6 +28,7 @@ class Game:
 
         self.snake = Snake(self.num_rows, self.num_cols)
 
+        self.grid_data = [ [0] * self.num_cols for _ in range(self.num_rows)]
         self.grid_cell = []
         self.draw_grid()
 
@@ -62,6 +63,7 @@ class Game:
             newAppleRect = self.grid_cell[self.apple_pos_x][self.apple_pos_y]
             pygame.draw.rect(self.screen, apple_cell_color, newAppleRect)
             pygame.display.update(newAppleRect)
+        self.grid_data[self.apple_pos_x][self.apple_pos_y]
 
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
@@ -73,6 +75,7 @@ class Game:
                 or (key == pygame.K_LEFT and head_y - 1 == self.apple_pos_y and head_x == self.apple_pos_x) \
                 or (key == pygame.K_RIGHT and head_y + 1 == self.apple_pos_y and head_x == self.apple_pos_x)
             alive, tail = self.snake.move(key, apple)  # apple
+            print(self.get_free_space()) # TO REMOVE, JUST FOR TESTING
             if not (tail is None) and self.show:
                 tailRect = self.grid_cell[tail[0]][tail[1]]
                 if self.show:
@@ -98,7 +101,38 @@ class Game:
 
     def get_free_space(self):
         [space_up, space_down, space_left, space_right] = [0, 0, 0, 0]
-        # TODO: implement
+
+        head_x, head_y = self.snake.getHead()
+        
+        # Up
+        for i in range(1, self.num_cols):
+            new_x, new_y = head_x - i, head_y
+            if new_x < 0 or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
+                break
+            space_up += 1
+
+        # Down
+        for i in range(1, self.num_cols):
+            new_x, new_y = head_x + i, head_y
+            if new_x >= self.num_cols or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
+                break
+            space_down += 1
+
+        # Left
+        for i in range(1, self.num_rows):
+            new_x, new_y = head_x, head_y + i
+            if new_y >= self.num_rows or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
+                break
+            space_left += 1
+
+        # Right
+        for i in range(1, self.num_rows):
+            new_x, new_y = head_x, head_y - i
+            if new_y < 0 or self.grid_data[new_x][new_y] != 0 or [new_x, new_y] in self.snake.body:
+                break
+            space_right += 1
+
+
         return [space_up, space_down, space_left, space_right]
 
     def get_apple_distance(self):
