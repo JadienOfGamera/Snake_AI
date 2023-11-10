@@ -1,15 +1,33 @@
+import pickle
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
 import multiprocessing
 import random
-
 import numpy as np
-
 from snake_neural_network import SnakeNN
 
-
 MULTITHREADING = True
+
+# Save the training state of the generation and population within a dedicated file "save_state"
+def save_training_state(generation, population):
+    state = {
+        'generation': generation,
+        'population': population
+    }
+    with open('save_state.pkl', 'wb') as file:
+        pickle.dump(state, file)
+
+
+# Load the training state if it exists, else, we generate a basic population
+def load_training_state():
+    if os.path.exists('save_state.pkl'):
+        with open('save_state.pkl', 'rb') as file:
+            state = pickle.load(file)
+            print(state['generation'])
+        return state['generation'], state['population']
+    else:
+        return 0, create_population(pop_size, num_of_chromosomes, min_val, max_val)
+
 
 def create_population(size, num_chromosomes, min_chromosome, max_chromosome):
     pop = []
@@ -20,6 +38,7 @@ def create_population(size, num_chromosomes, min_chromosome, max_chromosome):
         pop.append(agent)
     return pop
 
+
 def fitness_func(agent, show=True):  # TODO: change default show
     snn = SnakeNN()
     snn.set_weights(agent)
@@ -28,9 +47,12 @@ def fitness_func(agent, show=True):  # TODO: change default show
     if apples == 0:
         f -= moves
     return f + 1
+
+
 def selection_tournament(population, num_selected):
     population.sort(key=fitness_func, reverse=True)
     return population[:num_selected]
+
 
 def selection_wheel(population, num_selected):
     fitness_vals = []
@@ -44,6 +66,7 @@ def selection_wheel(population, num_selected):
     new_population = random.choices(population, weights=fitness_vals, cum_weights=None, k=num_selected)
     sorted_new_pop = [x for _, x in sorted(zip(fitness_vals, new_population), reverse=True)]
     return sorted_new_pop, np.average(fitness_vals)
+
 
 def crossover(population, num_children):
     new_generation = population[:num_children//2]
@@ -59,6 +82,7 @@ def crossover(population, num_children):
                 child.append(parent2[j])
         new_generation.append(child)
     return new_generation
+
 
 def mutation(population, num_mutations, min_chromosome, max_chromosome):
     for i_m in range(num_mutations):
@@ -76,14 +100,15 @@ if __name__ == '__main__':
     num_of_chromosomes = SnakeNN().num_chromosomes
     num_generations = 300
     selection_method = 'wheel'  # wheel or tournament
+    start_generation, p = load_training_state()
 
-    p = create_population(pop_size, num_of_chromosomes, min_val, max_val)
-    for i_gen in range(num_generations):
+    for i_gen in range(start_generation, num_generations):
         print("Generation", i_gen)
         p = crossover(p, pop_size)
         mutation(p, num_of_mutations, min_val, max_val)
         p, avg_f = selection_wheel(p, num_selected=select_this_many)
         print("Generation", i_gen, " fitness", avg_f)
+        save_training_state(i_gen + 1, p)
 
     snn_test = SnakeNN()
     snn_test.set_weights(p[0])
