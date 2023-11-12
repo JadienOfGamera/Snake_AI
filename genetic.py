@@ -1,12 +1,13 @@
 import pickle
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import multiprocessing
 import random
 import numpy as np
 from snake_neural_network import SnakeNN
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 MULTITHREADING = True
+
 
 # Save the training state of the generation and population within a dedicated file "save_state"
 def save_training_state(generation, population):
@@ -69,8 +70,8 @@ def selection_wheel(population, num_selected):
 
 
 def crossover(population, num_children):
-    new_generation = population[:num_children//2]
-    for i_c in range(num_children//2):
+    new_generation = population[:num_children // 2]
+    for i_c in range(num_children // 2):
         parent1 = population[random.randint(0, len(population) - 1)]
         parent2 = population[random.randint(0, len(population) - 1)]
         child = []

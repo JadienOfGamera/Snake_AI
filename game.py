@@ -1,9 +1,9 @@
 import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
-from random import randint
 import pygame
+from random import randint
 from Snake import Snake
+
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 empty_cell_border_color = (255, 255, 255)
 empty_cell_color = (0, 0, 0)
@@ -31,7 +31,7 @@ class Game:
 
         self.snake = Snake(self.num_rows, self.num_cols)
 
-        self.grid_data = [ [0] * self.num_cols for _ in range(self.num_rows)]
+        self.grid_data = [[0] * self.num_cols for _ in range(self.num_rows)]
         self.grid_cell = []
         self.draw_grid()
 

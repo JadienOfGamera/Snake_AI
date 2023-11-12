@@ -7,7 +7,8 @@ class NN:
         if len(size_layers) < 2:
             raise Exception("Not enough layers")
         if len(size_layers) != len(activations) + 1:
-            raise Exception("Incompatible layer parameters array size: len(size_layers) must be equal to len(activations) + 1")
+            raise Exception("Incompatible layer parameters array size: len(size_layers) must be equal to len("
+                            "activations) + 1")
 
         self.size_layers = size_layers
         self.num_chromosomes = 0
