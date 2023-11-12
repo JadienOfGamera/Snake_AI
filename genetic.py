@@ -93,15 +93,16 @@ def mutation(population, num_mutations, min_chromosome, max_chromosome):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    pop_size = 150
+    pop_size = 300
     min_val = -1.  # maximum value of a chromosome
     max_val = 1.
     select_this_many = 50
     num_of_mutations = int(pop_size * 0.008)
     num_of_chromosomes = SnakeNN().num_chromosomes
-    num_generations = 300
+    num_generations = 1500
     selection_method = 'wheel'  # wheel or tournament
     start_generation, p = load_training_state()
+    fitnesses = []
 
     for i_gen in range(start_generation, num_generations):
         print("Generation", i_gen)
@@ -109,9 +110,11 @@ if __name__ == '__main__':
         mutation(p, num_of_mutations, min_val, max_val)
         p, avg_f = selection_wheel(p, num_selected=select_this_many)
         print("Generation", i_gen, " fitness", avg_f)
+        fitnesses.append(avg_f)
         save_training_state(i_gen + 1, p)
 
     snn_test = SnakeNN()
     snn_test.set_weights(p[0])
+    # TODO draw fitness plot
     while True:
         snn_test.play(show=True)

@@ -13,7 +13,7 @@ class NN:
         self.size_layers = size_layers
         self.num_chromosomes = 0
         for i_size in range(len(size_layers) - 1):
-            self.num_chromosomes += size_layers[i_size] * size_layers[i_size + 1]
+            self.num_chromosomes += (size_layers[i_size] * 2 * size_layers[i_size + 1])
 
         self.model = tf.keras.Sequential()
 
@@ -23,14 +23,17 @@ class NN:
                 tf.keras.layers.Dense(size_layers[i_layer + 1], activation=activations[i_layer], kernel_initializer=tf.keras.initializers.Zeros(), name=("Dense" + str(i_layer))))
 
     def set_weights(self, chromosomes):
-        num_used_c = 0
         for layer_i in range(len(self.size_layers) - 1):
             weights = []
+            bias = np.array([])
+            c_used = 0
             for neuron_i in range(self.size_layers[layer_i]):
-                weights.append(chromosomes[num_used_c + neuron_i * self.size_layers[layer_i + 1]: (num_used_c + neuron_i * self.size_layers[layer_i + 1] + self.size_layers[layer_i + 1])])
-            bias = np.zeros(self.size_layers[layer_i + 1])
+                # Considering all neurons to be numbered sequentially we consider the agent to be [w1 b1 w2 b2 ... ]
+                weights.append(chromosomes[c_used : c_used + self.size_layers[layer_i + 1]])
+                c_used += self.size_layers[layer_i + 1]
+            bias = np.append(bias, chromosomes[c_used : c_used + self.size_layers[layer_i + 1]])
+            c_used += self.size_layers[layer_i + 1]
             self.model.layers[layer_i].set_weights([np.array(weights), bias])
-            num_used_c += self.size_layers[layer_i] * self.size_layers[layer_i + 1]
 
     def predict(self, in_value):
         if len(in_value) != self.size_layers[0]:
