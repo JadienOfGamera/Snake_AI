@@ -64,9 +64,11 @@ def selection_wheel(population, num_selected):
     else:
         for actor in population:
             fitness_vals.append(fitness_func(actor))
-    new_population = random.choices(population, weights=fitness_vals, cum_weights=None, k=num_selected)
-    sorted_new_pop = [x for _, x in sorted(zip(fitness_vals, new_population), reverse=True)]
-    return sorted_new_pop, np.average(fitness_vals)
+    new_pop_i = random.choices(range(len(population)), weights=fitness_vals, cum_weights=None, k=num_selected)
+    new_pop = [population[i] for i in new_pop_i]
+    new_f = [fitness_vals[i] for i in new_pop_i]
+    sorted_new_pop = [x for _, x in sorted(zip(new_f, new_pop), reverse=True)]
+    return sorted_new_pop, np.average(fitness_vals), np.max(fitness_vals)
 
 
 def crossover(population, num_children, num_preserved):
@@ -96,7 +98,7 @@ if __name__ == '__main__':
     pop_size = 300
     min_val = -1.  # maximum value of a chromosome
     max_val = 1.
-    select_this_many = pop_size // 3
+    select_this_many = pop_size // 2
     num_of_mutations = int(pop_size * 0.008)
     num_of_chromosomes = SnakeNN().num_chromosomes
     num_generations = 400
@@ -107,8 +109,9 @@ if __name__ == '__main__':
         if i_gen != 0:
             p = crossover(p, pop_size, select_this_many)
             mutation(p, num_of_mutations, min_val, max_val)
-        p, avg_f = selection_wheel(p, num_selected=select_this_many)
+        p, avg_f, max_f = selection_wheel(p, num_selected=select_this_many)
         fitnesses.append(avg_f)
+        print("Generation ", i_gen, " Fitness avg ", avg_f, "max ", max_f)
         save_training_state(i_gen + 1, p, fitnesses)
 
     snn_test = SnakeNN()
