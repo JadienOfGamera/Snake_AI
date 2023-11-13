@@ -39,15 +39,3 @@ class NN:
         if len(in_value) != self.size_layers[0]:
             raise Exception("Invalid length of input array, size must be", self.size_layers[0])
         return self.model.predict(tf.keras.utils.normalize(in_value, axis=0), verbose=0)
-
-
-if __name__ == "__main__":
-    # INPUTS: manhattan distance head-apple, body length, free space on each side
-    nn = NN([6, 9, 4], ["relu", "relu"])
-    c = []
-    for i in range(nn.num_chromosomes):
-        c.append(i)
-    print("LEN:", len(c))
-    nn.set_weights(c)
-    print(nn.model.weights)
-    print(nn.predict([0, 1, 0.2, 0.3, 0, 1]))

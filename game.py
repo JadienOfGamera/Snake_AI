@@ -68,11 +68,13 @@ class Game:
             pygame.display.update(newAppleRect)
         self.grid_data[self.apple_pos_x][self.apple_pos_y] = 0
 
+    # The snake moving means that its head and its body is moving along. If the head moves on an apple, the body grows. If the snake is moving perpetually without eatign any apple, we kill him and the game is loss
     def move_snake(self, key):
         if key == pygame.K_UP or key == pygame.K_DOWN or key == pygame.K_LEFT or key == pygame.K_RIGHT:
             self.moves_no_apple += 1
             self.num_moves += 1
             [head_x, head_y] = self.snake.getHead()
+            # apple variable is a boolean indicating if the head has the same coordinates as the apple
             apple = (key == pygame.K_UP and head_x - 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
                 or (key == pygame.K_DOWN and head_x + 1 == self.apple_pos_x and head_y == self.apple_pos_y) \
                 or (key == pygame.K_LEFT and head_y - 1 == self.apple_pos_y and head_x == self.apple_pos_x) \
@@ -84,7 +86,7 @@ class Game:
                     pygame.draw.rect(self.screen, empty_cell_color, tailRect)
                     pygame.draw.rect(self.screen, empty_cell_border_color, tailRect, 1)
                     pygame.display.update(tailRect)
-            if apple:
+            if apple: # if we touch the apple
                 self.generate_apple()
                 self.moves_no_apple = 0
             if alive and not(self.moves_no_apple > MAX_MOVES_NO_APPLE):
@@ -94,13 +96,15 @@ class Game:
                     pygame.draw.rect(self.screen, snake_cell_color, headRect)
                     pygame.display.update(headRect)
                 return True, self.get_score()
-            else:
+            else: # if we exceeds the maximum number of movement without eating apple
                 pygame.display.quit()
                 return False, self.get_score()
 
+    # The score is the size of the snake's body <=> number of apple eaten. It is used as an input of the NN
     def get_score(self):
         return len(self.snake.body), self.num_moves
 
+    # The free spaces at all directions is important to give us 4 of the 9 inputs necessery for the neurons network. The snake will prefer to go where the space is maximal
     def get_free_space(self):
         [space_up, space_down, space_left, space_right] = [0, 0, 0, 0]
 
@@ -136,6 +140,8 @@ class Game:
 
         return [space_up, space_down, space_left, space_right]
 
+    # Return the 4 Manhattan distances between the head and the apple position. It is computed before the movement (as an input of the NN), so the snake will prefer to go where the distance is minimal
+    # Manhattan Distance : Distance between 2 points in a grid system. Each cell increases the counter https://fr.wikipedia.org/wiki/Distance_de_Manhattan
     def get_apple_distance(self):
         md_up = abs(self.apple_pos_x - self.snake.getHead()[0]) + abs(self.apple_pos_y - (self.snake.getHead()[1] - 1))
         md_down = abs(self.apple_pos_x - self.snake.getHead()[0]) + abs(self.apple_pos_y - (self.snake.getHead()[1] + 1))
@@ -143,6 +149,7 @@ class Game:
         md_right = abs(self.apple_pos_x - (self.snake.getHead()[0] + 1)) + abs(self.apple_pos_y - self.snake.getHead()[1])
         return [md_up, md_down, md_left, md_right]
 
+    # Debugger. The game is played by a human, but there is no real challenge because the game is not automatic. snake_move method for instance is not used if the debugger is on.
     def start_human(self):
         running = True
         score = 0

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from snake_neural_network import SnakeNN
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+#The MULTITHREADING allows us to generate the population faster
 MULTITHREADING = True
 
 # Save the training state of the generation and population within a dedicated file "save_state"
@@ -45,10 +46,13 @@ def fitness_func(agent, show=False):
     snn = SnakeNN()
     snn.set_weights(agent)
     apples, moves = snn.play(show)
-    f = 0.001 + (2 * apples) ** 3 * moves
+    # The fitness function f is a ration between the score (nb of apple eaten) and the nb of movements.
+    # We are giving more importance to the score. The "1 +" is to give some value to the move if the snake does not eat any apple.
+    f = (1 + 2 * apples) ** 3 * moves
     return f
 
 
+# We select num_selected agents, where the probability of selecting each agent is proportional to their fitness
 def selection_wheel(population, num_selected):
     fitness_vals = []
     pool = multiprocessing.Pool()
@@ -64,6 +68,8 @@ def selection_wheel(population, num_selected):
     sorted_new_pop = [x for _, x in sorted(zip(new_f, new_pop), reverse=True)]
     return sorted_new_pop, np.average(fitness_vals), np.max(fitness_vals)
 
+
+# We select num_selected best agents after sorted their fitness function
 def selection_tournament(population, num_selected):
     fitness_vals = []
     pool = multiprocessing.Pool()
@@ -78,6 +84,7 @@ def selection_tournament(population, num_selected):
     return sorted_pop, np.average(fitness_vals), np.max(fitness_vals)
 
 
+# Generates a new generation by combining genetic material from randomly 2 selected parents, with a specified number of children and preserved individuals
 def crossover(population, num_children, num_preserved):
     new_generation = population[:num_children - num_preserved]
     for i_c in range(num_children - num_preserved):
@@ -103,13 +110,13 @@ def mutation(population, num_mutations, min_chromosome, max_chromosome):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     pop_size = 300
-    min_val = 0.  # minimum value of a chromosome
+    min_val = -1.  # minimum value of a chromosome
     max_val = 1.  # maximum value of a chromosome
     select_this_many = pop_size // 2
     num_of_mutations = int(pop_size * 0.008)
     num_of_chromosomes = SnakeNN().num_chromosomes
     num_generations = 400
-    selection_method = "tournament"  # wheel or tournament
+    selection_method = "wheel"  # wheel or tournament
     start_generation, p, fitnesses = load_training_state()
 
     for i_gen in range(start_generation, num_generations):
@@ -131,5 +138,6 @@ if __name__ == '__main__':
     plt.plot(range(len(fitnesses)), fitnesses)
     plt.show()
 
+    # When the training is complete, the program will play infinitely
     while True:
         snn_test.play(show=True)
