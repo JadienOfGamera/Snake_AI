@@ -9,7 +9,6 @@ from snake_neural_network import SnakeNN
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 MULTITHREADING = True
 
-
 # Save the training state of the generation and population within a dedicated file "save_state"
 def save_training_state(generation, population, fitnesses):
     state = {
@@ -50,11 +49,6 @@ def fitness_func(agent, show=False):
     return f
 
 
-def selection_tournament(population, num_selected):
-    population.sort(key=fitness_func, reverse=True)
-    return population[:num_selected]
-
-
 def selection_wheel(population, num_selected):
     fitness_vals = []
     pool = multiprocessing.Pool()
@@ -69,6 +63,19 @@ def selection_wheel(population, num_selected):
     new_f = [fitness_vals[i] for i in new_pop_i]
     sorted_new_pop = [x for _, x in sorted(zip(new_f, new_pop), reverse=True)]
     return sorted_new_pop, np.average(fitness_vals), np.max(fitness_vals)
+
+def selection_tournament(population, num_selected):
+    fitness_vals = []
+    pool = multiprocessing.Pool()
+    if MULTITHREADING:
+        for f in pool.map(fitness_func, population):
+            fitness_vals.append(f)
+    else:
+        for actor in population:
+            fitness_vals.append(fitness_func(actor))
+    sorted_pop = [x for _, x in sorted(zip(fitness_vals, population), reverse=True)]
+    sorted_pop = sorted_pop[:num_selected]
+    return sorted_pop, np.average(fitness_vals), np.max(fitness_vals)
 
 
 def crossover(population, num_children, num_preserved):
@@ -96,20 +103,24 @@ def mutation(population, num_mutations, min_chromosome, max_chromosome):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     pop_size = 300
-    min_val = -1.  # maximum value of a chromosome
-    max_val = 1.
+    min_val = 0.  # minimum value of a chromosome
+    max_val = 1.  # maximum value of a chromosome
     select_this_many = pop_size // 2
     num_of_mutations = int(pop_size * 0.008)
     num_of_chromosomes = SnakeNN().num_chromosomes
     num_generations = 400
-    selection_method = 'wheel'  # wheel or tournament
+    selection_method = "tournament"  # wheel or tournament
     start_generation, p, fitnesses = load_training_state()
 
     for i_gen in range(start_generation, num_generations):
         if i_gen != 0:
             p = crossover(p, pop_size, select_this_many)
             mutation(p, num_of_mutations, min_val, max_val)
-        p, avg_f, max_f = selection_wheel(p, num_selected=select_this_many)
+        if selection_method == "wheel":
+            p, avg_f, max_f = selection_wheel(p, num_selected=select_this_many)
+        else:
+            print("Evaluating generation ", i_gen)
+            p, avg_f, max_f = selection_tournament(p, num_selected=select_this_many)
         fitnesses.append(avg_f)
         print("Generation ", i_gen, " Fitness avg ", avg_f, "max ", max_f)
         save_training_state(i_gen + 1, p, fitnesses)
